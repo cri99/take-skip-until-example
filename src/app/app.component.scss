@@ -1,0 +1,130 @@
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 700px;
+    
+    .food-factory {
+        position: relative;
+        width: 100px;
+        width: fit-content;
+        top: -25px;
+        margin-top: 40px;
+
+        .left-tunnel-animation {
+            position: absolute;
+            animation: leftStraightLine 1s infinite linear;
+        }
+
+        .right-tunnel-animation {
+            position: absolute;
+            animation: rightStraightLine 1s infinite linear;
+        }
+
+
+        @keyframes leftStraightLine {
+            100% {
+                transform: translate3D(-200px, 77px, 0);
+            }
+        }
+
+        @keyframes rightStraightLine {
+            100% {
+                transform: translate3D(188px, 77px, 0);
+            }
+        }
+    }
+
+    .pantries {
+        margin: 70px;
+        width: 600px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    
+        .pantry {
+            border: 1px solid black;
+            border-radius: 10px;
+            width: 200px;
+            height: 150px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            
+            .pantry-top-icon {
+                position: absolute;
+                top: -10px;
+                transform: scale(1.7);
+                z-index: 2;
+    
+    
+                .icon {
+                    background: white;
+                    border-radius: 50%;
+                    box-shadow: 0px 1px 5px 0px #a0a0a0;
+    
+                    &.listening-icon {
+                        color: #4caf50;
+                    }
+        
+                    &.not-listening-icon {
+                        color: #d00000;
+                    }
+                }
+    
+                .listening-icon {
+                    color: #4caf50;
+                }
+    
+                .not-listening-icon {
+                    color: #d00000;
+                }
+            }
+    
+            .pantry-content {
+                position: relative;
+                width: 100%;
+                margin: 20px;
+                margin-left: 0;
+                .product {
+                    transition: opacity 1s linear;
+                    position: absolute;
+                }
+            }
+            
+        }
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 300px;
+        height: 100px;
+    }
+
+    .steps-info-container {
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        width: 600px;
+
+
+        .info-icon {
+            transform: scale(1.5);
+            display: flex;
+            margin-right: 20px;
+            color: #348bff;
+        }
+
+        .step-description {
+            .step {
+                .step-paragraph {
+                    margin-top: 3px;
+                    margin-bottom: 2px;
+                }
+            }
+        }
+    }
+}

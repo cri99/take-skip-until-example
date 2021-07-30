@@ -1,0 +1,99 @@
+<div class="main-container">
+
+
+
+    <div class="food-factory">
+        <ng-container *ngIf="!isFoodFactoryStopped">
+            <div class="left-tunnel-animation" *ngIf="!isLeftPantrySubCompleted"> {{ currentProductType }} </div>
+            <div class="right-tunnel-animation"> {{ currentProductType }} </div>
+        </ng-container>
+
+    </div>
+
+    <div class="pantries">
+
+        <div class="pantry">
+            <ng-container *ngTemplateOutlet="pantryTopIcon; 
+            context:  { 
+                pantryProducts: leftPantryProducts,
+                isListening: !isLeftPantrySubCompleted  
+            }"></ng-container>
+        </div>
+
+        <div class="pantry">
+            <ng-container *ngTemplateOutlet="pantryTopIcon; 
+                context:  { 
+                    pantryProducts: rightPantryProducts,
+                    isListening: isRightPantrySubListening  
+                }"></ng-container>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button mat-raised-button (click)="switchPantry()" [disabled]="isLeftPantrySubCompleted" color="primary">
+            CAMBIA DISPENSA
+        </button>
+
+        <button mat-raised-button (click)="stopFoodFactory()" [disabled]="isFoodFactoryStopped" color="warn">
+            FERMA DISTRIBUTORE DI CIBO
+        </button>
+    </div>
+
+
+
+
+
+    <ng-template #pantryTopIcon let-isListening="isListening" let-pantryProducts="pantryProducts">
+        <div class="pantry-top-icon">
+            <mat-icon *ngIf="isListening; else notListening" class="icon listening-icon">check_circle</mat-icon>
+            <ng-template #notListening>
+                <mat-icon class="icon not-listening-icon">cancel</mat-icon>
+            </ng-template>
+        </div>
+
+        <div class="pantry-content">
+            <ng-container *ngFor="let product of pantryProducts">
+                <div class="product" [style.left.%]="product.distanceFromLeft" [style.top.%]="product.distanceFromTop">
+                    {{ product.value }}
+                </div>
+            </ng-container>
+        </div>
+
+    </ng-template>
+
+
+    <mat-card class="steps-info-container">
+        <div class="info-icon">
+            <mat-icon>info</mat-icon>
+        </div>
+        <div class="step-description">
+            <!-- Descrizione dello step iniziale. Prima che l'utente prema qualsiasi bottone -->
+            <div class="step" *ngIf="!isLeftPantrySubCompleted">
+                <div class = "step-paragraph">
+                    Entrambe le dispense, ovvero le <strong>subscriptions</strong> della fabbrica, sono in ascolto sui
+                    prodotti emessi, ma la dispensa di destra li sta ignorando tutti grazie alla pipe <strong>skipUntil</strong>.
+                </div>  
+            </div>
+
+            <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPantryEvent$ -->
+            <div class="step" *ngIf="isRightPantrySubListening">
+                <div class = "step-paragraph">
+                    La subscription relativa alla dispensa sinistra ha effettuato l'unsubscribe grazie alla pipe
+                    <strong>takeUntil</strong>,
+                    non è quindi più in ascolto sull'observable della fabbrica.
+                </div>
+                <div class = "step-paragraph">
+                    La subscription relativa alla dispensa destra, poiché è stato emesso un valore dal Subject <strong>switchPantryEvent$</strong>, ha superato il blocco dello skipUntil.
+                    Adesso la dispensa destra è in ascolto dei prodotti che le arrivano finché (<strong>takeUntil</strong>) la fabbrica non smette di emettere valori (<strong>stopFoodFactoryEvent$</strong>) o 
+                    il componente viene distrutto (<strong>onDestroyEvent$</strong>) 
+                </div>
+                   
+            </div>
+
+            <div class="step" *ngIf="isFoodFactoryStopped">
+            </div>
+        </div>
+
+    </mat-card>
+
+</div>
