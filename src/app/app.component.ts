@@ -1,23 +1,24 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
 import { interval } from 'rxjs';
 import { merge, Observable, OperatorFunction, Subject } from 'rxjs';
 import { delay, map, share, skipUntil, takeUntil, tap } from 'rxjs/operators';
 
-export const PRODUCT_TYPES: ['🍪', '🍿', '🧁', '🥓', '🥞', '🍗'] = ['🍪' , '🍿' , '🧁', '🥓', '🥞', '🍗'];
  
-export type ProductTypeOptions = '🍪' | '🍿' | '🧁' | '🥓' | '🥞' | '🍗';
+export type DishTypeOptions = '🍔' | '🍜' | '🍟' | '🍳' | '🍭' | '🍋' | '🍣' | '🥟' | '🍝' | '🍮';
+export const DISH_TYPES: DishTypeOptions[] = ['🍔', '🍜', '🍟', '🍳', '🍭', '🍋', '🍣', '🥟', '🍝', '🍮'];
 
-export class Product {
-  value: ProductTypeOptions;
+export class Dish {
+  value: DishTypeOptions;
   distanceFromLeft: number;
   distanceFromTop: number;
 
-  constructor(productType: ProductTypeOptions) {
-    this.value = productType;
-    this.distanceFromLeft = Math.random() * 100 ;
-    this.distanceFromTop = Math.random() * 100;
- 
+  constructor(dishType: DishTypeOptions) {
+    this.value = dishType;
+
+    const randomAngle = Math.random() * Math.PI * 2;
+    const randomValForRadius =  Math.random() * 40;
+    this.distanceFromLeft = Math.cos(randomAngle) * randomValForRadius;
+    this.distanceFromTop = Math.sin(randomAngle) * randomValForRadius;
   }
 }
 
@@ -29,11 +30,11 @@ export class Product {
 export class AppComponent implements OnInit, OnDestroy {
   
   /**
-   * Evento emesso quando l'utente non vuole che vengano prodotti più biscotti
+   * Evento emesso quando l'utente non vuole che venga.....
    */
-  private readonly stopFoodFactoryEvent$ = new Subject<void>();
+  private readonly stopFoodDispencerEvent$ = new Subject<void>();
 
-  private readonly switchPantryEvent$ = new Subject<void>();
+  private readonly switchPlateEvent$ = new Subject<void>();
 
   /**
    * Un Subject che emetterà un valore e si completerà solamente quando 
@@ -42,83 +43,87 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly onDestroyEvent$ = new Subject<void>();
   
 
-  public currentProductType!: ProductTypeOptions; 
-  public leftPantryProducts: Product [] = [];
-  public rightPantryProducts: Product [] = [];
+  public currentDishType!: DishTypeOptions; 
+  public leftPlateDishes: Dish [] = [];
+  public rightPlateDishes: Dish [] = [];
 
-  private foodFactory$!: Observable<ProductTypeOptions>;
-  private leftPantryListener$!: Observable<Product>;
-  private rightPantryListener$!: Observable<Product>; 
+  private foodDispencer$!: Observable<DishTypeOptions>;
+  private leftPlateListener$!: Observable<Dish>;
+  private rightPlateListener$!: Observable<Dish>; 
 
-  public isLeftPantrySubCompleted = false;
-  public isRightPantrySubListening = false;
-  public isFoodFactoryStopped = false;
+  public isLeftPlateListenerCompleted = false;
+  public isRightPlateIgnoringDishes = true;
+  public isFoodDispencerStopped = false;
 
   ngOnInit() {
  
-    this.foodFactory$ = this.initializeFoodFactory$();
-    this.leftPantryListener$ = this.initializeLeftPantry$();
-    this.rightPantryListener$ = this.initializeRightPantry$();
+    this.foodDispencer$ = this.initializeFoodDispencer$();
+    this.leftPlateListener$ = this.initializeLeftPlate$();
+    this.rightPlateListener$ = this.initializeRightPlate$();
 
 
     /* In questo caso non c'è bisogno di gestire l'unsubscription perché sappiamo che switchPantryEvent$ è un evento 
-       che emette un solo valore e poi si completa immediatamente. Questo concetto vale anche per tutte le chiamate di httpClient ;-) */
-    this.switchPantryEvent$.subscribe(() => {
-      this.isRightPantrySubListening = true;
+       che emette un solo valore e poi si completa immediatamente. Questo concetto vale anche per tutte le chiamate di HttpClient ;-) */
+    this.switchPlateEvent$.subscribe(() => {
+      this.isRightPlateIgnoringDishes = false;
     });
 
 
-    this.foodFactory$.subscribe(
+    this.initializeSubscriptions();
+  }
+
+  private initializeSubscriptions() {
+    this.foodDispencer$.subscribe(
       () => {},
       () => {},
-      () => { this.isFoodFactoryStopped = true; }
+      () => { this.isFoodDispencerStopped = true; }
     );
     
-    this.leftPantryListener$.subscribe(
+    this.leftPlateListener$.subscribe(
       () => {}, 
       () => {}, 
-      () => { this.isLeftPantrySubCompleted = true } // On Complete callback
+      () => { this.isLeftPlateListenerCompleted = true } // On Complete callback
     );
 
-    this.rightPantryListener$.subscribe(
+    this.rightPlateListener$.subscribe(
       () => {}, 
       () => {}, 
-      () => { this.isRightPantrySubListening = false } // On Complete callback
+      () => { this.isRightPlateIgnoringDishes = true } // On Complete callback
     );
   }
 
-  private initializeFoodFactory$(): Observable<ProductTypeOptions> {
-    return interval(1000).pipe(
-      map(this.getRandomProductType),
-      tap(productType => this.currentProductType = productType),
-      delay(1000),
+  private initializeFoodDispencer$(): Observable<DishTypeOptions> {
+    return interval(500).pipe(
+      map(this.getRandomDishType),
+      tap(productType => this.currentDishType = productType),
+      delay(500),
       share(),
-      this.takeUntilAnyEmits(this.stopFoodFactoryEvent$, this.onDestroyEvent$)
+      this.takeUntilAnyEmits(this.stopFoodDispencerEvent$, this.onDestroyEvent$)
     );
   }
 
-  private initializeLeftPantry$(): Observable<Product> {
-    return this.foodFactory$.pipe(
+  private initializeLeftPlate$(): Observable<Dish> {
+    return this.foodDispencer$.pipe(
       this.createProductFromProductType(),
-      tap((newProduct: Product) => this.leftPantryProducts.push(newProduct)),
-      this.takeUntilAnyEmits(this.switchPantryEvent$, this.onDestroyEvent$)
+      tap((newProduct: Dish) => this.leftPlateDishes.push(newProduct)),
+      this.takeUntilAnyEmits(this.switchPlateEvent$, this.onDestroyEvent$)
     );
   }
 
-  private initializeRightPantry$(): Observable<Product> {
-    return this.foodFactory$.pipe(
-      skipUntil(this.switchPantryEvent$),
+  private initializeRightPlate$(): Observable<Dish> {
+    return this.foodDispencer$.pipe(
+      skipUntil(this.switchPlateEvent$),
       this.createProductFromProductType(),
-      tap((newProduct: Product) => this.rightPantryProducts.push(newProduct)),
+      tap((newProduct: Dish) => this.rightPlateDishes.push(newProduct)),
 
       takeUntil(this.onDestroyEvent$)
     );
   }
 
   private createProductFromProductType() {
-    return (sourceObservable: Observable<ProductTypeOptions>) => {
+    return (sourceObservable: Observable<DishTypeOptions>) => {
       return sourceObservable.pipe(
-        map((productType: ProductTypeOptions) => new Product(productType))
+        map((productType: DishTypeOptions) => new Dish(productType))
       );
     }
   }
@@ -131,14 +136,14 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  public switchPantry(): void {
-    this.switchPantryEvent$.next();
-    this.switchPantryEvent$.complete();
+  public switchPlate(): void {
+    this.switchPlateEvent$.next();
+    this.switchPlateEvent$.complete();
   }
 
-  public stopFoodFactory(): void {
-    this.stopFoodFactoryEvent$.next();
-    this.stopFoodFactoryEvent$.complete();
+  public stopFoodDispencer(): void {
+    this.stopFoodDispencerEvent$.next();
+    this.stopFoodDispencerEvent$.complete();
   }
 
   ngOnDestroy() {
@@ -147,7 +152,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
 
-  private getRandomProductType(): ProductTypeOptions {
-    return PRODUCT_TYPES[Math.floor( Math.random() * PRODUCT_TYPES.length) ];
+  private getRandomDishType(): DishTypeOptions {
+    return DISH_TYPES[Math.floor( Math.random() * DISH_TYPES.length) ];
   }
 }

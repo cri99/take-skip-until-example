@@ -1,11 +1,8 @@
 <div class="main-container">
-
-
-
     <div class="food-factory">
-        <ng-container *ngIf="!isFoodFactoryStopped">
-            <div class="left-tunnel-animation" *ngIf="!isLeftPantrySubCompleted"> {{ currentProductType }} </div>
-            <div class="right-tunnel-animation"> {{ currentProductType }} </div>
+        <ng-container *ngIf="!isFoodDispencerStopped">
+            <div class="left-tunnel-animation" *ngIf="!isLeftPlateListenerCompleted"> {{ currentDishType }} </div>
+            <div class="right-tunnel-animation"> {{ currentDishType }} </div>
         </ng-container>
 
     </div>
@@ -15,31 +12,29 @@
         <div class="pantry">
             <ng-container *ngTemplateOutlet="pantryTopIcon; 
             context:  { 
-                pantryProducts: leftPantryProducts,
-                isListening: !isLeftPantrySubCompleted  
+                pantryProducts: leftPlateDishes,
+                isListening: !isLeftPlateListenerCompleted  
             }"></ng-container>
         </div>
 
         <div class="pantry">
             <ng-container *ngTemplateOutlet="pantryTopIcon; 
                 context:  { 
-                    pantryProducts: rightPantryProducts,
-                    isListening: isRightPantrySubListening  
+                    pantryProducts: rightPlateDishes,
+                    isListening: !isRightPlateIgnoringDishes  
                 }"></ng-container>
         </div>
     </div>
 
     <div class="action-buttons">
-        <button mat-raised-button (click)="switchPantry()" [disabled]="isLeftPantrySubCompleted" color="primary">
-            CAMBIA DISPENSA
+        <button mat-raised-button (click)="switchPlate()" [disabled]="isLeftPlateListenerCompleted" color="primary">
+            CAMBIA PIATTO
         </button>
 
-        <button mat-raised-button (click)="stopFoodFactory()" [disabled]="isFoodFactoryStopped" color="warn">
+        <button mat-raised-button (click)="stopFoodDispencer()" [disabled]="isFoodDispencerStopped" color="warn">
             FERMA DISTRIBUTORE DI CIBO
         </button>
     </div>
-
-
 
 
 
@@ -51,15 +46,20 @@
             </ng-template>
         </div>
 
-        <div class="pantry-content">
-            <ng-container *ngFor="let product of pantryProducts">
-                <div class="product" [style.left.%]="product.distanceFromLeft" [style.top.%]="product.distanceFromTop">
-                    {{ product.value }}
-                </div>
-            </ng-container>
+
+        <div class="inner-pantry">
+            <div class="pantry-content">
+                <ng-container *ngFor="let product of pantryProducts">
+                    <div class="product" [style.left.%]="product.distanceFromLeft" [style.top.%]="product.distanceFromTop">
+                        {{ product.value }}
+                    </div>
+                </ng-container>
+            </div>
         </div>
 
     </ng-template>
+
+
 
 
     <mat-card class="steps-info-container">
@@ -68,29 +68,33 @@
         </div>
         <div class="step-description">
             <!-- Descrizione dello step iniziale. Prima che l'utente prema qualsiasi bottone -->
-            <div class="step" *ngIf="!isLeftPantrySubCompleted">
+            <div class="step" *ngIf="!isLeftPlateListenerCompleted">
                 <div class = "step-paragraph">
-                    Entrambe le dispense, ovvero le <strong>subscriptions</strong> della fabbrica, sono in ascolto sui
-                    prodotti emessi, ma la dispensa di destra li sta ignorando tutti grazie alla pipe <strong>skipUntil</strong>.
+                    Entrambi i piatti, ovvero le <strong>subscriptions</strong> del distributore, sono in ascolto sulle
+                    pietanze emesse, ma il piatto di destra le sta ignorando tutte grazie alla pipe <strong>skipUntil</strong>.
                 </div>  
             </div>
 
             <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPantryEvent$ -->
-            <div class="step" *ngIf="isRightPantrySubListening">
+            <div class="step" *ngIf="!isRightPlateIgnoringDishes">
                 <div class = "step-paragraph">
-                    La subscription relativa alla dispensa sinistra ha effettuato l'unsubscribe grazie alla pipe
+                    La subscription relativa al piatto sinistro ha effettuato l'unsubscribe grazie alla pipe
                     <strong>takeUntil</strong>,
-                    non è quindi più in ascolto sull'observable della fabbrica.
+                    di conseguenza il distributore non emette più valori verso questa subscription.
                 </div>
                 <div class = "step-paragraph">
-                    La subscription relativa alla dispensa destra, poiché è stato emesso un valore dal Subject <strong>switchPantryEvent$</strong>, ha superato il blocco dello skipUntil.
-                    Adesso la dispensa destra è in ascolto dei prodotti che le arrivano finché (<strong>takeUntil</strong>) la fabbrica non smette di emettere valori (<strong>stopFoodFactoryEvent$</strong>) o 
+                    La subscription relativa al piatto destro, poiché è stato emesso un valore dal Subject <strong>switchPantryEvent$</strong>, ha superato il blocco dello skipUntil.
+                    Adesso il piatto destro è in ascolto dei prodotti che le arrivano finché (<strong>takeUntil</strong>) il distributore non smette di emettere valori (<strong>stopFoodDispencerEvent$</strong>) o 
                     il componente viene distrutto (<strong>onDestroyEvent$</strong>) 
                 </div>
                    
             </div>
 
-            <div class="step" *ngIf="isFoodFactoryStopped">
+            <div class="step" *ngIf="isFoodDispencerStopped">
+                <div class = "step-paragraph">
+                    L'observable sorgente del distributore di cibo è in stato <strong>completato</strong> e quindi non emetterà più valori. 
+                    <strong>Viene effettuato automaticamente l'unsubscribe di tutte le subscriptions in ascolto</strong>.
+                </div>
             </div>
         </div>
 

@@ -14,12 +14,12 @@
 
         .left-tunnel-animation {
             position: absolute;
-            animation: leftStraightLine 1s infinite linear;
+            animation: leftStraightLine 0.5s infinite linear;
         }
 
         .right-tunnel-animation {
             position: absolute;
-            animation: rightStraightLine 1s infinite linear;
+            animation: rightStraightLine 0.5s infinite linear;
         }
 
 
@@ -44,14 +44,14 @@
         align-items: center;
     
         .pantry {
-            border: 1px solid black;
-            border-radius: 10px;
+            border-radius: 50%;
             width: 200px;
-            height: 150px;
+            height: 160px;
             position: relative;
             display: flex;
+            box-shadow: 0px 1px 5px #8c8c8c;
             justify-content: center;
-            
+
             .pantry-top-icon {
                 position: absolute;
                 top: -10px;
@@ -82,15 +82,26 @@
                 }
             }
     
-            .pantry-content {
-                position: relative;
+            .inner-pantry {
                 width: 100%;
-                margin: 20px;
-                margin-left: 0;
-                .product {
-                    transition: opacity 1s linear;
-                    position: absolute;
+                margin: 17px;
+                border-radius: 50%;
+                border: 1px solid #ffffff;
+                box-shadow: inset -1px 1px 4px grey;
+
+                .pantry-content {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    left: 72px;
+                    top: 52px;
+
+                    .product {
+                        transition: opacity 1s linear;
+                        position: absolute;
+                    }
                 }
+                
             }
             
         }
