@@ -1,26 +1,24 @@
 <div class="main-container">
-    <div class="food-factory">
+    <div class="food-dispencer">
         <ng-container *ngIf="!isFoodDispencerStopped">
-            <div class="left-tunnel-animation" *ngIf="!isLeftPlateListenerCompleted"> {{ currentDishType }} </div>
-            <div class="right-tunnel-animation"> {{ currentDishType }} </div>
+            <div class="left-dish-animation" *ngIf="!isLeftPlateListenerCompleted"> {{ currentDishType }} </div>
+            <div class="right-dish-animation"> {{ currentDishType }} </div>
         </ng-container>
-
     </div>
 
-    <div class="pantries">
-
-        <div class="pantry">
-            <ng-container *ngTemplateOutlet="pantryTopIcon; 
+    <div class="plates">
+        <div class="plate">
+            <ng-container *ngTemplateOutlet="plateTopIcon; 
             context:  { 
-                pantryProducts: leftPlateDishes,
+                plateDishes: leftPlateDishes,
                 isListening: !isLeftPlateListenerCompleted  
             }"></ng-container>
         </div>
 
-        <div class="pantry">
-            <ng-container *ngTemplateOutlet="pantryTopIcon; 
+        <div class="plate">
+            <ng-container *ngTemplateOutlet="plateTopIcon; 
                 context:  { 
-                    pantryProducts: rightPlateDishes,
+                    plateDishes: rightPlateDishes,
                     isListening: !isRightPlateIgnoringDishes  
                 }"></ng-container>
         </div>
@@ -38,8 +36,8 @@
 
 
 
-    <ng-template #pantryTopIcon let-isListening="isListening" let-pantryProducts="pantryProducts">
-        <div class="pantry-top-icon">
+    <ng-template #plateTopIcon let-isListening="isListening" let-plateDishes = "plateDishes">
+        <div class="plate-top-icon">
             <mat-icon *ngIf="isListening; else notListening" class="icon listening-icon">check_circle</mat-icon>
             <ng-template #notListening>
                 <mat-icon class="icon not-listening-icon">cancel</mat-icon>
@@ -47,11 +45,11 @@
         </div>
 
 
-        <div class="inner-pantry">
-            <div class="pantry-content">
-                <ng-container *ngFor="let product of pantryProducts">
-                    <div class="product" [style.left.%]="product.distanceFromLeft" [style.top.%]="product.distanceFromTop">
-                        {{ product.value }}
+        <div class="inner-plate">
+            <div class="plate-content">
+                <ng-container *ngFor="let dish of plateDishes">
+                    <div class="dish" [style.left.%]="dish.distanceFromLeft" [style.top.%]="dish.distanceFromTop">
+                        {{ dish.dishType }}
                     </div>
                 </ng-container>
             </div>
@@ -75,7 +73,7 @@
                 </div>  
             </div>
 
-            <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPantryEvent$ -->
+            <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPlateEvent$ -->
             <div class="step" *ngIf="!isRightPlateIgnoringDishes">
                 <div class = "step-paragraph">
                     La subscription relativa al piatto sinistro ha effettuato l'unsubscribe grazie alla pipe
@@ -83,7 +81,7 @@
                     di conseguenza il distributore non emette più valori verso questa subscription.
                 </div>
                 <div class = "step-paragraph">
-                    La subscription relativa al piatto destro, poiché è stato emesso un valore dal Subject <strong>switchPantryEvent$</strong>, ha superato il blocco dello skipUntil.
+                    La subscription relativa al piatto destro, poiché è stato emesso un valore dal Subject <strong>switchPlateEvent$</strong>, ha superato il blocco dello skipUntil.
                     Adesso il piatto destro è in ascolto dei prodotti che le arrivano finché (<strong>takeUntil</strong>) il distributore non smette di emettere valori (<strong>stopFoodDispencerEvent$</strong>) o 
                     il componente viene distrutto (<strong>onDestroyEvent$</strong>) 
                 </div>
