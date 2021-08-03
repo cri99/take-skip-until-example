@@ -164,7 +164,7 @@ export class AppComponent implements OnInit, OnDestroy {
     );
 
 
-    /* In questo caso non c'è bisogno di gestire l'unsubscription in alcun modo perché sappiamo che switchPantryEvent$ è un evento 
+    /* In questo caso non c'è bisogno di gestire l'unsubscription in alcun modo perché sappiamo che switchPlateEvent$ è un evento 
        che emette un solo valore e poi si completa immediatamente. Questo concetto vale anche per tutte le chiamate di HttpClient ;-) 
        
        ...Sì, in questo caso particolare si sarebbe potuto cambiare il valore di "isRightPlateIgnoringDishes" direttamente nel metodo "switchPlate()".  */
@@ -207,7 +207,7 @@ export class AppComponent implements OnInit, OnDestroy {
       // Viene creata una pietanza effettiva (Dish) a partire dal tipo emesso dal distributore (DishTypeOptions)
       this.createDishFromDishType(),
       // Le pietanze create vengono aggiunte all'insieme di pietanze presenti nel piatto sinistro, così che l'utente le possa vedere nel piatto
-      tap((newProduct: Dish) => this.leftPlateDishes.push(newProduct)),
+      tap((newDish: Dish) => this.leftPlateDishes.push(newDish)),
       // Se viene emesso un valore dall'observable switchPlateEvent$ oppure viene distrutto il componente, l'observable entra in stato "completato" e smette di emettere valori
       this.takeUntilAny(this.switchPlateEvent$, this.onDestroyEvent$)
     );
@@ -225,7 +225,7 @@ export class AppComponent implements OnInit, OnDestroy {
       // Una volta superato il blocco iniziale dello skipUntil, le pietanze sono pronte per essere posizionate nel piatto ed 
       // il comportamento è analogo all'observable relativo al piatto sinistro 
       this.createDishFromDishType(), 
-      tap((newProduct: Dish) => this.rightPlateDishes.push(newProduct)),
+      tap((newDish: Dish) => this.rightPlateDishes.push(newDish)),
       // Se viene distrutto il componente, l'observable entra in stato "completato" e smette di emettere valori
       takeUntil(this.onDestroyEvent$)
     );
@@ -266,6 +266,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.switchPlateEvent$.complete();
   }
 
+  /**
+   * Metodo chiamato quando l'utente desidera fermare il distributore di cibo
+   */
   public stopFoodDispencer(): void {
     this.stopFoodDispencerEvent$.next();
     this.stopFoodDispencerEvent$.complete();

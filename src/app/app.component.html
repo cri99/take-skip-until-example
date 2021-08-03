@@ -1,4 +1,5 @@
 <div class="main-container">
+    <!-- Sezione Animazioni delle pietanze in arrivo verso i piatti -->
     <div class="food-dispencer">
         <ng-container *ngIf="!isFoodDispencerStopped">
             <div class="left-dish-animation" *ngIf="!isLeftPlateListenerCompleted"> {{ currentDishType }} </div>
@@ -6,6 +7,7 @@
         </ng-container>
     </div>
 
+    <!-- Sezione Piatti -->
     <div class="plates">
         <div class="plate">
             <ng-container *ngTemplateOutlet="plateTopIcon; 
@@ -24,6 +26,7 @@
         </div>
     </div>
 
+    <!-- Sezione bottoni azione -->
     <div class="action-buttons">
         <button mat-raised-button (click)="switchPlate()" [disabled]="isLeftPlateListenerCompleted" color="primary">
             CAMBIA PIATTO
@@ -36,30 +39,7 @@
 
 
 
-    <ng-template #plateTopIcon let-isListening="isListening" let-plateDishes = "plateDishes">
-        <div class="plate-top-icon">
-            <mat-icon *ngIf="isListening; else notListening" class="icon listening-icon">check_circle</mat-icon>
-            <ng-template #notListening>
-                <mat-icon class="icon not-listening-icon">cancel</mat-icon>
-            </ng-template>
-        </div>
-
-
-        <div class="inner-plate">
-            <div class="plate-content">
-                <ng-container *ngFor="let dish of plateDishes">
-                    <div class="dish" [style.left.%]="dish.distanceFromLeft" [style.top.%]="dish.distanceFromTop">
-                        {{ dish.dishType }}
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-
-    </ng-template>
-
-
-
-
+    <!-- Sezione informazioni descrittive di ogni step -->
     <mat-card class="steps-info-container">
         <div class="info-icon">
             <mat-icon>info</mat-icon>
@@ -73,7 +53,7 @@
                 </div>  
             </div>
 
-            <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPlateEvent$ -->
+            <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPlateEvent$ (ovvero dopo che è stato premuto il bottone "CAMBIA PIATTO") -->
             <div class="step" *ngIf="!isRightPlateIgnoringDishes">
                 <div class = "step-paragraph">
                     La subscription relativa al piatto sinistro ha effettuato l'unsubscribe grazie alla pipe
@@ -82,12 +62,13 @@
                 </div>
                 <div class = "step-paragraph">
                     La subscription relativa al piatto destro, poiché è stato emesso un valore dal Subject <strong>switchPlateEvent$</strong>, ha superato il blocco dello skipUntil.
-                    Adesso il piatto destro è in ascolto dei prodotti che le arrivano finché (<strong>takeUntil</strong>) il distributore non smette di emettere valori (<strong>stopFoodDispencerEvent$</strong>) o 
+                    Adesso il piatto destro è in ascolto delle pietanze che le arrivano finché (<strong>takeUntil</strong>) il distributore non smette di emettere valori (<strong>stopFoodDispencerEvent$</strong>) o 
                     il componente viene distrutto (<strong>onDestroyEvent$</strong>) 
                 </div>
                    
             </div>
 
+            <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento stopFoodDispencerEvent$ (ovvero dopo che è stato premuto il bottone "FERMA DISTRIBUTORE DI CIBO") -->
             <div class="step" *ngIf="isFoodDispencerStopped">
                 <div class = "step-paragraph">
                     L'observable sorgente del distributore di cibo è in stato <strong>completato</strong> e quindi non emetterà più valori. 
@@ -99,3 +80,30 @@
     </mat-card>
 
 </div>
+
+
+
+
+<!-- Template comune per entrambi i piatti -->
+<ng-template #plateTopIcon let-isListening="isListening" let-plateDishes = "plateDishes">
+    <div class="plate-top-icon">
+        <mat-icon *ngIf="isListening; else notListening" class="icon listening-icon">check_circle</mat-icon>
+        <ng-template #notListening>
+            <mat-icon class="icon not-listening-icon">cancel</mat-icon>
+        </ng-template>
+    </div>
+
+    <div class="inner-plate">
+        <div class="plate-content">
+            <!-- Si scorre tutte le pietanze per ogni piatto -->
+            <ng-container *ngFor="let dish of plateDishes">
+                <!-- Ogni alimento viene posizionato all'interno del piatto secondo le sue coordinate -->
+                <div class="dish" [style.left.%]="dish.distanceFromLeft" [style.top.%]="dish.distanceFromTop">
+                    <!-- Di ogni pietanza viene mostrata nel piatto solo la relativa emoji -->
+                    {{ dish.dishType }}
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+</ng-template>
