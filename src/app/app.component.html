@@ -63,7 +63,7 @@
                     di conseguenza il distributore non emette più valori verso questa subscription.
                 </div>
                 <div class = "step-paragraph">
-                    La subscription relativa al piatto destro, poiché è stato emesso un valore dal Subject <strong>switchPlateEvent$</strong>, ha superato il blocco dello skipUntil.
+                    L'observable relativa al piatto destro (<strong>rightPlateListener$</strong>), poiché è stato emesso un valore dal Subject <strong>switchPlateEvent$</strong>, ha superato il blocco dello skipUntil.
                     Adesso il piatto destro è in ascolto delle pietanze che le arrivano finché (<strong>takeUntil</strong>) il distributore non smette di emettere valori (<strong>stopFoodDispencerEvent$</strong>) o 
                     il componente viene distrutto (<strong>onDestroyEvent$</strong>) 
                 </div>
