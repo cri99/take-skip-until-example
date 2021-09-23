@@ -51,19 +51,19 @@
             <div class="step" *ngIf="!isLeftPlateListenerCompleted">
                 <div class = "step-paragraph">
                     Entrambi i piatti, ovvero le <strong>subscriptions</strong> del distributore, sono in ascolto sulle
-                    pietanze emesse, ma il piatto di destra le sta ignorando tutte grazie alla pipe <strong>skipUntil</strong>.
+                    pietanze emesse, ma il piatto di destra le sta ignorando tutte grazie all'operatore <strong>skipUntil</strong>.
                 </div>  
             </div>
 
             <!-- Descrizione dello stato in cui si trova l'applicativo dopo che è stato emesso l'evento switchPlateEvent$ (ovvero dopo che è stato premuto il bottone "CAMBIA PIATTO") -->
             <div class="step" *ngIf="!isRightPlateIgnoringDishes">
                 <div class = "step-paragraph">
-                    La subscription relativa al piatto sinistro ha effettuato l'unsubscribe grazie alla pipe
+                    La subscription relativa al piatto sinistro ha effettuato l'unsubscribe grazie all'operatore
                     <strong>takeUntil</strong>,
                     di conseguenza il distributore non emette più valori verso questa subscription.
                 </div>
                 <div class = "step-paragraph">
-                    L'observable relativa al piatto destro (<strong>rightPlateListener$</strong>), poiché è stato emesso un valore dal Subject <strong>switchPlateEvent$</strong>, ha superato il blocco dello skipUntil.
+                    L'observable relativo al piatto destro (<strong>rightPlateListener$</strong>), poiché è stato emesso un valore dal Subject <strong>switchPlateEvent$</strong>, ha superato il blocco dello skipUntil.
                     Adesso il piatto destro è in ascolto delle pietanze che le arrivano finché (<strong>takeUntil</strong>) il distributore non smette di emettere valori (<strong>stopFoodDispencerEvent$</strong>) o 
                     il componente viene distrutto (<strong>onDestroyEvent$</strong>) 
                 </div>

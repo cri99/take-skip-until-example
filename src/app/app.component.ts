@@ -121,7 +121,7 @@ export class AppComponent implements OnInit, OnDestroy {
   
   /**
    * Indica se l'observable che riceve le pietanze in arrivo sul piatto destro sta ignorando le pietanze 
-   * in arrivo (sia per la pipe skipUntil, che per il relativo l'observable in stato "completato")
+   * in arrivo (sia per l skipUntil, che per il relativo l'observable in stato "completato")
    */
   public isRightPlateIgnoringDishes = true;
   
@@ -144,24 +144,17 @@ export class AppComponent implements OnInit, OnDestroy {
    * Metodo in cui vengono attivate tutte le subscriptions
    */
   private initializeSubscriptions() {
-    
-    this.foodDispencer$.subscribe(
-      () => {},
-      () => {},
-      () => { this.isFoodDispencerStopped = true; } // Callback eseguita quando l'observable relativo al distributore di cibo entra in stato "completato"
-    );
-    
-    this.leftPlateListener$.subscribe(
-      () => {}, 
-      () => {}, 
-      () => { this.isLeftPlateListenerCompleted = true } // Callback eseguita quando l'observable relativo al piatto sinistro entra in stato "completato"
-    );
+    this.foodDispencer$.subscribe({
+      complete: () => { this.isFoodDispencerStopped = true; }
+    });
 
-    this.rightPlateListener$.subscribe(
-      () => {}, 
-      () => {}, 
-      () => { this.isRightPlateIgnoringDishes = true } // Callback eseguita quando l'observable relativo al piatto destro entra in stato "completato"
-    );
+    this.leftPlateListener$.subscribe({
+      complete: () => { this.isLeftPlateListenerCompleted = true; }
+    });
+
+    this.rightPlateListener$.subscribe({
+      complete: () => { this.isRightPlateIgnoringDishes = true; }
+    });
 
 
     /* In questo caso non c'è bisogno di gestire l'unsubscription in alcun modo perché sappiamo che switchPlateEvent$ è un evento 
@@ -188,7 +181,7 @@ export class AppComponent implements OnInit, OnDestroy {
       tap((dishType: DishTypeOptions) => this.currentDishType = dishType),
       // Il delay sottostante è necessario per dare il tempo all'animazione della pietanza di raggiungere i piatti
       delay(emissionDelay),
-      // La pipe share è necessaria per rendere questo observable multicast, ovvero per assicurarsi che ogni nuova subscription condivida la stessa sorgente dati.
+      // L'operatore "share" è necessario per rendere questo observable multicast, ovvero per assicurarsi che ogni nuova subscription condivida la stessa sorgente dati.
       // In parole povere, non vogliamo creare un distributore di cibo per ogni piatto... Vogliamo un unico distributore di cibo a prescindere dal numero di piatti!
       // Se non ti è chiaro il concetto non ti preoccupare, non è banale e merita un esempio a sé per essere compreso a fondo (continua a seguirmi per rimanere aggiornato...),
       // per il momento abbi fiducia e concentrati sul focus dell'esercizio 😉
@@ -219,7 +212,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private initializeRightPlate$(): Observable<Dish> {
     return this.foodDispencer$.pipe(
-      // Con la pipe skipUntil si scarta tutti i valori emessi dall'observable sorgente foodDispencer$ finchè non viene emesso un valore dall'observable switchPlateEvent$
+      // Con l'operatore skipUntil si scarta tutti i valori emessi dall'observable sorgente foodDispencer$ finchè non viene emesso un valore dall'observable switchPlateEvent$
       skipUntil(this.switchPlateEvent$),
       
       // Una volta superato il blocco iniziale dello skipUntil, le pietanze sono pronte per essere posizionate nel piatto ed 
@@ -232,7 +225,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Custom pipe che dato un tipo di pietanza (DishTypeOptions) restituisce una pietanza effettiva 
+   * Operatore custom che dato un tipo di pietanza (DishTypeOptions) restituisce una pietanza effettiva 
    * con anche le sue coordinate generate casualmente
    * @returns una nuova pietanza effettiva (Dish)
    */
@@ -245,7 +238,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Custom pipe che funziona esattamente come la pipe "takeUntil", con l'unica differenza che è possibile
+   * Operatore custom che funziona esattamente come l'operatore "takeUntil", con l'unica differenza che è possibile
    * specificare più di un notifier su cui rimanere in ascolto per generare il completamento dell'observable sorgente
    * @param notifiers$ 
    * @returns 
